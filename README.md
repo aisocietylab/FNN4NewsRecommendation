@@ -3,7 +3,7 @@
 ## Project Structure
 
 - `configs/`: The model configurations used in the experiments.
-- `datasets/`: The datasets used in the experiments. Place the downloaded datasets as described [here](#datasets).
+- `datasets/`: The datasets used in the experiments. Place the downloaded datasets as described below.
 - `results/`: The results of the experiments will be saved here.
 - `scripts/`: The scripts used to run the experiments.
 - `scripts/baselines/`: The implementations of the baseline models.
