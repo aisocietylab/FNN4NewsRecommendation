@@ -103,13 +103,6 @@ class DatasetBoolenizer:
     fitted: bool = field(init=False, default=False)
 
     def _create_default_one_hot_encoder(self, categorical_df: pd.DataFrame):
-        # default one hot encoder
-        # categories = []
-        # for col in categorical_df.columns:
-        #    if col in self.column_mappings:
-        #        categories.append(list(self.column_mappings[col].values()))
-        #    else:
-        #        categories.append(categorical_df[col].unique())
         categories = "auto"
         return OneHotEncoder(
             categories=categories,
@@ -204,7 +197,6 @@ class DatasetBoolenizer:
             transformed_data[~is_nan] = discretized_data
             transformed_data[is_nan] = np.nan
 
-            # TODO: check if `total_pageviews` is correctly mapped
             transformed_columns.append(transformed_data)
 
         return scipy.sparse.hstack(transformed_columns)
@@ -258,7 +250,7 @@ class DatasetBoolenizer:
         if self.one_hot_encoder is None:
             # default one hot encoder
             self.one_hot_encoder = self._create_default_one_hot_encoder(categorical_df)
-        # assert categorical_df.isna().sum().sum() == 0, "NaNs found in categorical data!"
+
         if categorical_df.isna().sum().sum() > 0:
             logging.debug("Dropping NaNs for fitting one-hot encoder.")
         # NaN will not be treated as a seperate category, instead we use imputation later on
@@ -336,7 +328,6 @@ class DatasetBoolenizer:
         column_names.extend(self.one_hot_encoder.get_feature_names_out())
 
         for discretizer in self._numerical_column_discretizers:
-            # TODO: improve naming, e.g., replace suffix for the first quantile (currently `0.0`) with `low`, `q0`, `q33%`, ...
             assert len(discretizer.feature_names_in_) == 1
             column_name = discretizer.feature_names_in_[0]
             num_quantiles = discretizer.n_bins_[0]
@@ -515,7 +506,6 @@ def create_graph_for_split(
                 "article_ids_clicked",
                 "read_time",
                 "scroll_percentage",
-                # "impression_time", # we keep the impression time, because it gives insight on when the user was first active (in the train dataset)!
             ]
         )
     else:
@@ -597,7 +587,7 @@ def create_graph_for_split(
     )
     encoded_input = scipy.sparse.hstack(
         [
-            # FIXME: there is a bug in the scipy sparse matrix indexing implementation, because it downcasts to int32 internally, leading to an overflow during indexing
+            # FIXME: there is a bug in the scipy sparse matrix indexing implementation, because it downcasts to int32 internally, leading to an overflow during indexing for large datasets
             encoded_behaviors[encoded_behaviors_idx],
             encoded_articles[encoded_articles_idx],
         ],
@@ -626,7 +616,7 @@ def create_graph_for_split(
         encoded_input_columns.extend(article_age_atoms.columns)
         encoded_input_sources.extend(["impression"] * len(article_age_atoms.columns))
 
-    # TODO: support sparse tensors with the rest of the framework!
+    # TODO: support sparse tensors with the rest of the framework
     encoded_input = torch.sparse_coo_tensor(
         np.vstack((encoded_input.row, encoded_input.col)),
         encoded_input.data,
@@ -640,7 +630,6 @@ def create_graph_for_split(
     data["user", "rates", "item"].x = encoded_input
     data["user", "rates", "item"].global_id = impression_id
 
-    # FIXME: used by training loop, due to old splitting behavior.
     data["user", "rates", "item"].edge_label_index = edge_index
     data["user", "rates", "item"].edge_label_time = impression_time
     data["user", "rates", "item"].edge_label_predefined = encoded_input
@@ -728,12 +717,10 @@ def impute_missing_values(
             (len(unique_ids), data.shape[1]), dtype=torch.float32
         )
         # write to the same indices will just overwrite, so we get each article/user only once
-        # TODO: speed this up
         unique_impressions[group_ids] = data.float()
         return unique_impressions
 
     # Get each users unique features
-    # TODO: user's profile can be updated between impressions, which would mean a user's features might change over time. Here, we
     deduplicated_user_features = deduplicate_features_by_id(
         train_df["user", "rates", "item"].edge_label_predefined[:, user_indices],
         user_ids,
@@ -763,7 +750,6 @@ def impute_missing_values(
             transformers,
             sparse_threshold=0,  # always return dense, because we use pytorch tensors (sparse is not yet fully supported)
         )
-        # TODO: Try to skip this, we need to fit the column imputers seperateley
         imputer.fit(
             train_df["user", "rates", "item"].edge_label_predefined,
         )
@@ -864,7 +850,6 @@ def create_ebnerd_graph_datasets(
     if behavior_boolenizer is None:
         behavior_boolenizer = DatasetBoolenizer(
             column_mappings=COLUMN_MAPPINGS_BEHAVIORS_EBNERD,
-            # TODO: `is_sso_user`, and `article_id` (might help if there is a frequently shared article that users click on, should be treated as categorical though)
             process_columns=[
                 "read_time",
                 "scroll_percentage",
@@ -1102,7 +1087,6 @@ def create_mind_graph_datasets(
             "time"
         ]
 
-        # TODO: does not have impressions!
         test_data = create_graph_for_split(
             test_behaviors_df,
             test_articles_df,

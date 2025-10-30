@@ -85,7 +85,6 @@ class LogicLayer(nn.Module):
         activation_function: str = "Sigmoid",
         logic_operation: Literal["and", "or"] = "and",
         initialization: Literal["normal", "uniform", "xavier", "orthogonal"] = "normal",
-        dropout: float | None = None,
     ):
         super().__init__()
 
@@ -104,11 +103,8 @@ class LogicLayer(nn.Module):
         self.with_negated_outputs = with_negated_outputs
         self.activation_function = getattr(nn, activation_function)()
         self.logic_operation = logic_operation
-        self.dropout = dropout
 
-        # initialise weights (gain=1, because we use sigmoid)
         initialization = initialization.lower()
-        # TODO: map some activation functions to `sigmoid`
         nonlinearity = activation_function.lower()
         if nonlinearity == "hardsigmoid":
             # Hardsigmoid needs the same gain as sigmoid
@@ -116,7 +112,6 @@ class LogicLayer(nn.Module):
 
         gain = nn.init.calculate_gain(nonlinearity)
         if initialization == "xavier":
-            # recommended for `sigmoid`
             nn.init.xavier_uniform_(self.weights, gain=gain)
         elif initialization == "kaiming":
             nn.init.kaiming_uniform_(self.weights, nonlinearity=nonlinearity)
@@ -141,7 +136,6 @@ class LogicLayer(nn.Module):
 
         weighted_atoms = self.weight_atoms(atoms, extraction_threshold)
 
-        # FIXME: bias behavior is not good yet!
         if self.logic_operation == "and":
             y = self.ops.land_aggregate(weighted_atoms)
         else:
@@ -235,7 +229,6 @@ class UserItemAtomEmbedding:
             embedding_dim=self.num_item_embeddings,
         )
 
-    # TODO: return a `padding_idx` if `global_user_ids` is not in `user_ids`! These are val or test only users! Same for articles
     def get_user_embeddings(
         self, user_embeddings: nn.Embedding, global_user_ids: torch.Tensor
     ) -> torch.Tensor:
@@ -250,7 +243,7 @@ class UserItemAtomEmbedding:
         idx = matches_user_ids.int().argmax(dim=-1)
         embeddings = user_embeddings(idx)
 
-        # TODO: consider using different methods for unknown users (e.g., learn/set padding embedding)
+        # mean embedding for unknown users
         embeddings[unknown_user_rows] = torch.mean(user_embeddings.weight.data, dim=0)
 
         return embeddings
@@ -269,7 +262,7 @@ class UserItemAtomEmbedding:
         idx = matches_item_ids.int().argmax(dim=-1)
         embeddings = item_embeddings(idx)
 
-        # TODO: consider using different methods for unknown items (e.g., learn/set padding embedding)
+        # mean embedding for unknown items
         embeddings[unknown_item_rows] = torch.mean(item_embeddings.weight.data, dim=0)
 
         return embeddings
@@ -324,7 +317,6 @@ class MyDataset(torch.utils.data.Dataset):
             pd.DataFrame(
                 {
                     "impression_id": impression_ids.numpy(),
-                    # "article_id": article_ids.numpy()[~self.positive_samples_mask],
                     "graph_idx": range(len(impression_ids)),
                 }
             )[~self.positive_samples_mask.numpy()]
@@ -388,7 +380,6 @@ class MyDataset(torch.utils.data.Dataset):
             inputs.append(self.all_inputs[negative_sample_idx])
             user_ids.append(self.all_user_ids[negative_sample_idx])
             article_ids.append(self.all_item_ids[negative_sample_idx])
-        # TODO: support inputs in sparse format
         return (
             np.concatenate(inputs),
             np.concatenate(user_ids),
@@ -438,7 +429,6 @@ class LogicNetwork(nn.Module):
         fuzzy_operators: ProductTNormOperators | None = None,
         embedding_atoms_config: UserItemAtomEmbedding | None = None,
     ):
-        # TODO: most arguments are included in the `Config`. We could use the config instead of passing them individually.
         super().__init__()
 
         if fuzzy_operators is None:
@@ -455,14 +445,9 @@ class LogicNetwork(nn.Module):
         )
 
         self.orthogonal_loss_method = config.model.orthogonal_loss_method
-        self.dropout = config.model.dropout
         self.concat_negated_atoms = config.model.concat_negated_atoms
         self.with_negated_node_outputs = config.model.with_negated_node_outputs
         self.embedding_atoms_config = embedding_atoms_config
-
-        assert not self.dropout, (
-            "TODO: apply dropout only to input (set atoms=0.5?, or marginalize?)"
-        )
 
         if self.embedding_atoms_config:
             self.item_embedding = embedding_atoms_config.create_item_embedding()
@@ -600,8 +585,6 @@ class LogicNetwork(nn.Module):
             self.eval()
             predictions = self(graph_data)
 
-        # TODO: group predictions by impression_id and evaluate
-        # %%
         prediction_impression_ids = graph_data[
             "user", "rates", "item"
         ].edge_label_global_id
@@ -669,7 +652,6 @@ class LogicNetwork(nn.Module):
     ):
         model_device = self.layers[0].weights.device
         predictions = torch.empty(0, device=model_device)
-        # for batch in tqdm(dataloader, desc="Batches", unit="batch"):
         for batch in tqdm(
             dataloader, desc=progress_bar_desc, unit="batch", **tqdm_kwargs
         ):
@@ -696,8 +678,6 @@ class LogicNetwork(nn.Module):
     ):
         x = predefined_atoms
 
-        # TODO: it is essential that we have "neutral" embedding (pad embedding)
-        #   for users and articles not seen during training!
         # concat embeddings. Users first
         if self.user_embedding:
             assert self.embedding_atoms_config is not None
@@ -742,7 +722,6 @@ class LogicNetwork(nn.Module):
     def get_fuzzy_weights(
         self, extraction_threshold=None
     ) -> list[list[list[tuple[int, float]]]]:
-        # TODO: improve fuzzy weight extraction (refactor)
         all_fuzzy_weights = []
 
         for i, horn_layer in enumerate(self.layers):
@@ -765,7 +744,6 @@ class LogicNetwork(nn.Module):
         return torch.cat([layer.get_fuzzy_weights().flatten() for layer in self.layers])
 
     def _compute_sparsity_loss(self):
-        # FIXME: if dropout is used, only the active weights should be considered by the l1_loss!
         fuzzy_weights_flattened = self.get_fuzzy_weights_flattened()
         l1_loss = torch.sum(torch.abs(fuzzy_weights_flattened))
 
@@ -829,7 +807,6 @@ class LogicNetwork(nn.Module):
         negative_sampled_indices = torch.concat(negative_samples_indices)
 
         tensors = negative_dataset[negative_sampled_indices]
-        # return torch.utils.data.TensorDataset(*tensors)
         return tensors
 
     def extract_sympy_rules(
@@ -952,7 +929,6 @@ class LogicNetwork(nn.Module):
         # move model to device
         self = self.to(device)
 
-        # FIXME: one-hot-loss does not converge! (implementation issues)
         self.atom_names = (
             train_graph[edge_name].edge_label_predefined_names
             + [f"u{u}" for u in range(self.config.model.num_user_embedding_atoms)]
@@ -966,7 +942,6 @@ class LogicNetwork(nn.Module):
             negative_sampling_ratio=num_negative_samples_per_positive,
             with_labels=True,
             rating_edge_name=edge_name,
-            # TODO: instead just regenerate the dataset after an epoch (self.config.training.perform_repeated_sampling)
         )
         val_dataset = MyDataset(
             graph_data=evaluation_graph,
@@ -1010,7 +985,6 @@ class LogicNetwork(nn.Module):
                 item_ids = item_ids.to(device)
                 labels = labels.to(device)
                 # predict
-                # FIXME: use actual user_ids, not the edge indices, which are mapped to a different range!
                 y_pred = self(predefined_atoms, user_ids, item_ids)
 
                 actual_percent_relevant.append(torch.mean(y_pred).item())
@@ -1035,11 +1009,8 @@ class LogicNetwork(nn.Module):
                 # backward pass
                 optimizer.zero_grad()
                 loss.backward()
-
-                # torch.nn.utils.clip_grad_norm_(
-                #     self.parameters(), max_norm=1.0, norm_type=2.0
-                # )
                 optimizer.step()
+
                 batch_iter.set_postfix(
                     {
                         "min(pred)": f"{y_pred.min().item():.4f}",
@@ -1068,7 +1039,6 @@ class LogicNetwork(nn.Module):
             with torch.no_grad():
                 # Validation phase
                 self.eval()
-                # val_dataset = self.create_dataset_for_graph(evaluation_graph)
 
                 val_dataloader = self.create_dataloader_for_graph(
                     val_dataset, batch_size=batch_size, with_labels=True
@@ -1086,7 +1056,6 @@ class LogicNetwork(nn.Module):
             for threshold in [0.5, 0.55]:
                 rules = self.extract_sympy_rules(threshold=threshold)
                 rule_complexity_at_threshold[f"RC@{threshold}"] = rule_complexity(rules)
-            # TODO: evaluate model and show metrics
             epoch_iter.set_postfix(
                 {
                     r"mean(pred)": f"{np.mean(actual_percent_relevant):.4f}",
