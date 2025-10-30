@@ -16,7 +16,7 @@
 
 1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
 2. Download the dataset from [here](https://recsys.eb.dk/). Requires you to accept the license. We use `ebnerd_small (80MB)`.
-3. Download the MIND dataset from [here](https://msnews.github.io/).
+3. Download the MIND dataset from [here](https://msnews.github.io/). Requires you to accept the license. We use **`MIND-small`**.
 
 
 #### Datasets
@@ -32,35 +32,25 @@ Create a `datasets` folder and place the datasets in there. The folder structure
 │   │   │   ├── behaviors.parquet
 │   │   ├── val/
 │   │   │   ├── behaviors.parquet
-│   ├── ebnerd_large/
-│   │   ├── ...
-│   ├── ebnerd_test/
-│   │   ├── ...
 │   ├── mind_small/
 │   │   ├── train/
 │   │   │   ├── behaviors.tsv
 │   │   │   ├── news.tsv
+│   │   │   ├── ...
 │   │   ├── valid/
 │   │   │   ├── behaviors.tsv
 │   │   │   ├── news.tsv
-│   ├── mind_large/
-│   │   ├── train/
 │   │   │   ├── ...
-│   │   ├── valid/
-│   │   │   ├── ...
-│   │   ├── test/
-│   │   │   ├── behaviors.tsv
-│   │   │   ├── news.tsv
 ```
 
 ## Running Experiments
 
 The experiment scripts are located in the `scripts/` directory as bash scripts.
 
-1. `all_experiments.sh`: Runs all experiments (EB-NeRD, MIND, baselines, ablation study and sensitivity analysis).
+1. `all_experiments.sh`: Runs all experiments (EB-NeRD, MIND, ablation study, sensitivity analysis and baselines).
 2. `ebnerd_experiment.sh`: Runs the EB-NeRD experiments.
 3. `mind_experiment.sh`: Runs the MIND experiments.
 4. `ablation_study.sh`: Runs the ablation study experiments.
-5. `baselines.sh`: Runs the baseline experiments.
-6. `sensitivity_analysis.sh`: Runs the sensitivity analysis experiments.
+5. `sensitivity_analysis.sh`: Runs the sensitivity analysis experiments. Takes multiple hours.
+6. `baselines.sh`: Runs the baseline experiments.
 

@@ -1,0 +1,22 @@
+*.parquet
+*.zip
+__MACOSX/
+.DS_Store
+*Zone.Identifier
+*.log
+*.csv
+*.pth
+results
+nvcluster
+datasets
+lib
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+*.pdf
+
+# Jupyter
+.ipynb_checkpoints/

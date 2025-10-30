@@ -1,0 +1,22 @@
+{
+    "data": {
+        "name": "mind",
+        "good_rating_threshold": 0.5,
+        "rating_edge_name": [
+            "user",
+            "rates",
+            "item"
+        ],
+        "base_path": "datasets/mind_small",
+        "dataset_type": "mind"
+    },
+    "model": {},
+    "training": {
+        "skip_validation": true
+    },
+    "evaluation": {
+        "num_repeat_experiment": 5,
+        "used_baselines": []
+    },
+    "results_path": "results/mind"
+}

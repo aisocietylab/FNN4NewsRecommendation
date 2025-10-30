@@ -1,0 +1,21 @@
+{
+    "data": {
+        "name": "ebnerd",
+        "good_rating_threshold": 0.5,
+        "rating_edge_name": [
+            "user",
+            "rates",
+            "item"
+        ],
+        "base_path": "datasets/ebnerd_small",
+        "cache_path": "datasets/cache/ablation-ebnerd.pickle"
+    },
+    "model": {},
+    "training": {
+        "skip_validation": true
+    },
+    "evaluation": {
+        "num_repeat_experiment": 5,
+        "used_baselines": []
+    }
+}
