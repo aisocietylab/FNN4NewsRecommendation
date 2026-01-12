@@ -1,5 +1,7 @@
 # News Recommender
 
+![Method Overview](MethodDesign.png)
+
 ## Project Structure
 
 - `configs/`: The model configurations used in the experiments.

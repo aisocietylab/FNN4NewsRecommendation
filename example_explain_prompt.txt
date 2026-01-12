@@ -1,0 +1,9 @@
+$C_\texttt{nationen}$ represents the "nations" category of an article.
+$SC_\texttt{265}$ represents the subcategory "german football".
+$IV_\text{low}$ represents that the article was rareley in-view (i.e. part of the recommended articles).
+$AA_\text{interval}$ represents that the article's age lies in the "interval".
+
+The following rule is a requirement for a user to click on an article.
+$C_\text{nationen} \lor{} SC_\text{265} \lor{} IV_\text{low} \lor{} \neg{}AA_{30m-1h} \lor{} \neg{}AA_{1d<}$
+
+Provide a concise explanation of user behavior for editors without a background in logic. Be concrete:

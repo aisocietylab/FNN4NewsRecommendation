@@ -1,0 +1,22 @@
+Here’s a clear, concrete explanation for editors without a logic background:
+
+---
+
+**When will a user likely click on an article?**
+A user tends to click on an article if **at least one** of the following is true:
+
+1. **Category is "Nationen"**: The article is tagged under the "Nationen" category.
+2. **Subcategory is "German Football"**: The article is specifically about German football (subcategory 265).
+3. **Rarely Recommended**: The article was rarely shown in recommendations (low in-view).
+4. **Not Too Recent**: The article is **not** between 30 minutes and 1 hour old.
+5. **Not Too Old**: The article is **not** older than 1 day.
+
+---
+
+**In plain terms:**
+Users are more likely to click on articles that are either:
+- About "Nationen" or German football,
+- Rarely recommended (so they feel "fresh" or unique),
+- Or not too new (older than 1 hour) or not too old (younger than 1 day).
+
+This helps editors prioritize content that fits these patterns to boost engagement.
