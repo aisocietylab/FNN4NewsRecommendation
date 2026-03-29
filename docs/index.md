@@ -3,6 +3,7 @@ layout: project
 project:
   authors:
     - name: "Kevin Innerebner"
+      url: "https://online.tugraz.at/tug_online/visitenkarte.show_vcard?pPersonenId=1E34A1A962FA4625&pPersonenGruppe=3"
     - name: "Stephan Bartl"
     - name: "Markus Reiter-Haas"
       url: "https://iseratho.github.io/"
