@@ -31,13 +31,18 @@ project:
 
   abstract: "News recommender systems are increasingly driven by black-box models, offering little transparency for editorial decision-making. In this work, we introduce a transparent recommender system that uses fuzzy neural networks to learn human-readable rules from behavioral data for predicting article clicks. By extracting the rules at configurable thresholds, we can control rule complexity and thus, the level of interpretability. We evaluate our approach on two publicly available news datasets (i.e., MIND and EB-NeRD) and show that we can accurately predict click behavior compared to several established baselines, while learning human-readable rules. Furthermore, we show that the learned rules reveal news consumption patterns, enabling editors to align content curation goals with target audience behavior."
   bibtex: |
-    @misc{innerebner2026modelingbehavioralpatternsnews,
-          title={Modeling Behavioral Patterns in News Recommendations Using Fuzzy Neural Networks}, 
-          author={Kevin Innerebner and Stephan Bartl and Markus Reiter-Haas and Elisabeth Lex},
-          year={2026},
-          eprint={2601.04019},
-          archivePrefix={arXiv},
-          primaryClass={cs.LG},
-          url={https://arxiv.org/abs/2601.04019}, 
+    @inproceedings{innerebnerModelingBehavioralPatterns2026,
+      address = {Cham},
+      title = {Modeling {Behavioral} {Patterns} in {News} {Recommendations} {Using} {Fuzzy} {Neural} {Networks}},
+      isbn = {978-3-032-21324-2},
+      doi = {10.1007/978-3-032-21324-2_30},
+      language = {en},
+      booktitle = {Advances in {Information} {Retrieval}},
+      publisher = {Springer Nature Switzerland},
+      author = {Innerebner, Kevin and Bartl, Stephan and Reiter-Haas, Markus and Lex, Elisabeth},
+      editor = {Campos, Ricardo and Jatowt, Adam and Lan, Yanyan and Aliannejadi, Mohammad and Bauer, Christine and MacAvaney, Sean and Anand, Avishek and Ren, Zhaochun and Verberne, Suzan and Bai, Nan and Mansoury, Masoud},
+      year = {2026},
+      keywords = {Fuzzy Logic, News Consumption, Rule Learning, Transparent Recommender Systems, User Behavior Modeling},
+      pages = {384--397},
     }
 ---
