@@ -1,5 +1,6 @@
 ---
 layout: project
+title: "Modeling Behavioral Patterns in News Recommendations Using Fuzzy Neural Networks"
 project:
   authors:
     - name: "Kevin Innerebner"
