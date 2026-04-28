@@ -13,6 +13,9 @@ project:
   conference: "ECIR'26, IR-for-Good-Track"
 
   links:
+    - label: Proceedings
+      icon: ai ai-springer
+      url: "https://link.springer.com/chapter/10.1007/978-3-032-21324-2_30"
     - label: Paper
       icon: fas fa-file-pdf
       url: "https://arxiv.org/pdf/2601.04019.pdf"
@@ -22,6 +25,9 @@ project:
     - label: arXiv
       icon: ai ai-arxiv
       url: "https://arxiv.org/abs/2601.04019"
+    - label: Slides
+      icon: fas fa-person-chalkboard
+      url: "./assets/pdfs/FNN-ECIR26-presentation.pdf"
 
 
   teaser:
@@ -47,3 +53,7 @@ project:
       pages = {384--397},
     }
 ---
+
+## Acknowledgments
+
+*This research was funded in whole or in part by the Austrian Science Fund (FWF) 10.55776/COE12.*

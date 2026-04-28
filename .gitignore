@@ -16,7 +16,6 @@ __pycache__/
 *.py[cod]
 *.egg
 *.egg-info/
-*.pdf
 
 # Jupyter
 .ipynb_checkpoints/
